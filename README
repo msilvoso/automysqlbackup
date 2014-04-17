@@ -61,7 +61,7 @@ find /var/backup/db* -type d -exec chmod 700 {} \;
 
 #~~~~~ Copy To Above Here ~~~~
 
-2. Save it to a suitable location or copy it to your /etc/cron.daily folder. 
+2. Save it to a suitable location or copy it to your /etc/cron.daily folder.
 
 3. Make it executable, i.e. chmod +x /etc/cron.daily/runmysqlbackup.
 
@@ -132,34 +132,6 @@ The global config file which overwrites the default configuration is located her
 "/etc/automysqlbackup/automysqlbackup.conf" by default.
 
 Please take a look at the supplied "automysqlbackup.conf" for information about the configuration options.
-
-Default configuration
-CONFIG_configfile="/etc/automysqlbackup/automysqlbackup.conf"
-CONFIG_backup_dir='/var/backup/db'
-CONFIG_do_monthly="01"
-CONFIG_do_weekly="5"
-CONFIG_rotation_daily=6
-CONFIG_rotation_weekly=35
-CONFIG_rotation_monthly=150
-CONFIG_mysql_dump_usessl='yes'
-CONFIG_mysql_dump_username='root'
-CONFIG_mysql_dump_password=''
-CONFIG_mysql_dump_host='localhost'
-CONFIG_mysql_dump_socket=''
-CONFIG_mysql_dump_create_database='no'
-CONFIG_mysql_dump_use_separate_dirs='yes'
-CONFIG_mysql_dump_compression='gzip'
-CONFIG_mysql_dump_commcomp='no'
-CONFIG_mysql_dump_latest='no'
-CONFIG_mysql_dump_max_allowed_packet=''
-CONFIG_db_names=()
-CONFIG_db_month_names=()
-CONFIG_db_exclude=( 'information_schema' )
-CONFIG_mailcontent='log'
-CONFIG_mail_maxattsize=4000
-CONFIG_mail_address='root'
-CONFIG_encrypt='no'
-CONFIG_encrypt_password='password0123'
 
 !! automysqlbackup (the shell program) accepts one parameter, the filename of a configuration file. The entries in there will supersede all others.
 

@@ -23,7 +23,9 @@ upgrade_config_file () {
     temp=$(mktemp /tmp/tmp.XXXXXX)
     (( $? != 0 )) && return 1
     activateIO "$temp"
-    echo "#version=3.0_rc2"
+    echo "#version=3.0.1"
+    echo "# DONT'T REMOVE THE PREVIOUS VERSION LINE!"
+    echo "#"
     echo "# Uncomment to change the default values (shown after =)"
     echo "# WARNING:"
     echo "# This is not true for UMASK, CONFIG_prebackup and CONFIG_postbackup!!!"
@@ -139,7 +141,10 @@ upgrade_config_file () {
     fi
     echo ""
     echo "# List of tables to exclude, in the form db_name.table_name"
-    echo "#CONFIG_table_exclude=()"
+    echo "# You may use wildcards for the table names, i.e. 'mydb.a*' selects all tables starting with an 'a'."
+    echo "# However we only offer the wildcard '*', matching everything that could appear, which translates to the"
+    echo "# '%' wildcard in mysql."
+    echo "#CONFIG_table_exclude=( 'mysql.event' )"
     echo ""
     echo ""
     echo "# Advanced Settings"
@@ -215,7 +220,7 @@ upgrade_config_file () {
     echo "#CONFIG_mysql_dump_single_transaction='no'"
     echo ""
     echo "# http://dev.mysql.com/doc/refman/5.0/en/mysqldump.html#option_mysqldump_master-data"
-    echo "# --master-data[=value] "
+    echo "# --master-data[=value]"
     echo "# Use this option to dump a master replication server to produce a dump file that can be used to set up another"
     echo "# server as a slave of the master. It causes the dump output to include a CHANGE MASTER TO statement that indicates"
     echo "# the binary log coordinates (file name and position) of the dumped server. These are the master server coordinates"
@@ -225,7 +230,7 @@ upgrade_config_file () {
     echo "# it has no effect when the dump file is reloaded. If the option value is 1, the statement is not written as a comment"
     echo "# and takes effect when the dump file is reloaded. If no option value is specified, the default value is 1."
     echo "#"
-    echo "# This option requires the RELOAD privilege and the binary log must be enabled. "
+    echo "# This option requires the RELOAD privilege and the binary log must be enabled."
     echo "#"
     echo "# The --master-data option automatically turns off --lock-tables. It also turns on --lock-all-tables, unless"
     echo "# --single-transaction also is specified, in which case, a global read lock is acquired only for a short time at the"
@@ -245,7 +250,7 @@ upgrade_config_file () {
     echo "#"
     echo "# If you require routines to be re-created with their original timestamp attributes, do not use --routines. Instead,"
     echo "# dump and reload the contents of the mysql.proc table directly, using a MySQL account that has appropriate privileges"
-    echo "# for the mysql database. "
+    echo "# for the mysql database."
     echo "#"
     echo "# This option was added in MySQL 5.0.13. Before that, stored routines are not dumped. Routine DEFINER values are not"
     echo "# dumped until MySQL 5.0.20. This means that before 5.0.20, when routines are reloaded, they will be created with the"
@@ -253,6 +258,10 @@ upgrade_config_file () {
     echo "# load the contents of the mysql.proc table directly as described earlier."
     echo "#"
     echo "#CONFIG_mysql_dump_full_schema='yes'"
+    echo ""
+    echo "# Backup status of table(s) in textfile. This is very helpful when restoring backups, since it gives an idea, what changed"
+    echo "# in the meantime."
+    echo "#CONFIG_mysql_dump_dbstatus='yes'"
     echo ""
     echo "# Backup dump settings"
     echo ""
@@ -290,6 +299,21 @@ upgrade_config_file () {
     echo "# and removes the date and time information from the filenames (if present)."
     echo "#CONFIG_mysql_dump_latest_clean_filenames='no'"
     echo ""
+    echo '# Create differential backups. Master backups are created weekly at #$CONFIG_do_weekly weekday. Between master backups,'
+    echo "# diff is used to create differential backups relative to the latest master backup. In the Manifest file, you find the"
+    echo "# following structure"
+    echo '# $filename   md5sum  $md5sum diff_id $diff_id    rel_id  $rel_id'
+    echo "# where each field is separated by the tabular character '\t'. The entries with $ at the beginning mean the actual values,"
+    echo "# while the others are just for readability. The diff_id is the id of the differential or master backup which is also in"
+    echo "# the filename after the last _ and before the suffixes begin, i.e. .diff, .sql and extensions. It is used to relate"
+    echo '# differential backups to master backups. The master backups have 0 as $rel_id and are thereby identifiable. Differential'
+    echo '# backups have the id of the corresponding master backup as $rel_id.'
+    echo "#"
+    echo '# To ensure that master backups are kept long enough, the value of $CONFIG_rotation_daily is set to a minimum of 21 days.'
+    echo "#"
+    echo "#CONFIG_mysql_dump_differential='no'"
+    echo ""
+    echo ""
     echo "# Notification setup"
     echo ""
     echo "# What would you like to be mailed to you?"
@@ -310,6 +334,12 @@ upgrade_config_file () {
       echo "#CONFIG_mail_maxattsize=4000"
     fi
     echo ""
+    echo "# Allow packing of files with tar and splitting it in pieces of CONFIG_mail_maxattsize."
+    echo "#CONFIG_mail_splitandtar='yes'"
+    echo ""
+    echo "# Use uuencode instead of mutt. WARNING: Not all email clients work well with uuencoded attachments."
+    echo "#CONFIG_mail_use_uuencoded_attachments='no'"
+    echo ""
     echo "# Email Address to send mail to? (user@domain.com)"
     if isSet MAILADDR; then
       printf '%s=%q\n' CONFIG_mail_address "${MAILADDR-}"
@@ -317,19 +347,6 @@ upgrade_config_file () {
       echo "#CONFIG_mail_address='root'"
     fi
     echo ""
-	echo '# Create differential backups. Master backups are created weekly at #$CONFIG_do_weekly weekday. Between master backups,'
-	echo "# diff is used to create differential backups relative to the latest master backup. In the Manifest file, you find the"
-	echo "# following structure"
-	echo '# $filename 	md5sum	$md5sum	diff_id	$diff_id	rel_id	$rel_id'
-	echo "# where each field is separated by the tabular character '\t'. The entries with $ at the beginning mean the actual values,"
-	echo "# while the others are just for readability. The diff_id is the id of the differential or master backup which is also in"
-	echo "# the filename after the last _ and before the suffixes begin, i.e. .diff, .sql and extensions. It is used to relate"
-	echo '# differential backups to master backups. The master backups have 0 as $rel_id and are thereby identifiable. Differential'
-	echo '# backups have the id of the corresponding master backup as $rel_id.'
-	echo "#"
-	echo '# To ensure that master backups are kept long enough, the value of $CONFIG_rotation_daily is set to a minimum of 21 days.'
-	echo "#"
-	echo "#CONFIG_mysql_dump_differential='no'"
     echo ""
     echo "# Encryption"
     echo ""
@@ -370,6 +387,7 @@ upgrade_config_file () {
     echo "# inactive: =0 or commented out"
     echo "# active: uncommented AND =1"
     echo "#CONFIG_dryrun=1"
+    echo ""
     removeIO
     mv "$temp" "${1}_converted"
     return 0
@@ -404,9 +422,8 @@ parse_config_file () {
 echo "### Checking archive files for existence, readability and integrity."
 echo
 
-precheck_files=( automysqlbackup 7a82ee63819f9b6f584f63af69aee8cd
-automysqlbackup.conf d525efa3da15ce9fea96893e5a8ce6d5
-README b17740fcd3a5f8579b907a42249a83cd
+precheck_files=( automysqlbackup 9521db1605f02c2a1d954d96b12f8267
+automysqlbackup.conf d3bc45d8792c2fc563c763ca865b9e99
 LICENSE 39bba7d2cf0ba1036f2a6e2be52fe3f0
 )
 
