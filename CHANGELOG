@@ -2,6 +2,10 @@
 # Change Log
 #=====================================================================
 #
+# version 3.1 - (2014-04-18)
+#     - Major cleanup
+#     - Added possibility to load configuration file to avoid warning
+#       about password in command line in mysql 5.6
 # version 3.0_rc4 - (2011-11-24)
 #     - Removing mkfifo commands, thereby improving portability.
 #     - Fixing not working table exclude feature for wildcards.
@@ -17,7 +21,7 @@
 #       methods available.
 #     - Fixed some bugs.
 # version 3.0_beta2 - (2011-08-21)
-#     - Added possibility to backup local files. 
+#     - Added possibility to backup local files.
 #     - Added full schema backup.
 #     - Added master-data option.
 #     - Fixed some bugs.
@@ -91,7 +95,7 @@
 #    Added "CONFIG_mysql_dump_latest" to additionally store the last backup to a standard location. (request by Grant29)
 # version 2.3 - (2005-11-07)
 #    Better error handling and notification of errors (a long time coming)
-#    Compression on Backup server to MySQL server communications. 
+#    Compression on Backup server to MySQL server communications.
 # version 2.2 - (2004-12-05)
 #    Changed from using depricated "-N" to "--skip-column-names".
 #    Added ability to have compressed backup's emailed out. (code from Thomas Heiserowski)
@@ -102,7 +106,7 @@
 #    Switched to using IO redirection instead of pipeing the output to the logfile.
 #    Added choice of compression of backups being gzip of bzip2.
 #    Switched to using functions to facilitate more functionality.
-#    Added option of either gzip or bzip2 compression. 
+#    Added option of either gzip or bzip2 compression.
 # version 1.10 - (2004-07-17)
 #    Another fix for spaces in the paths (fix by Thomas von Eyben)
 #    Fixed bug when using PREBACKUP and POSTBACKUP commands containing many arguments.
@@ -159,6 +163,6 @@
 # version 0.3 - (2002-10-01)
 #   Changed Naming of Weekly backups so they will show in order.
 # version 0.2 - (2002-09-27)
-#   Corrected weekly rotation logic to handle weeks 0 - 10 
+#   Corrected weekly rotation logic to handle weeks 0 - 10
 # version 0.1 - (2002-09-21)
 #   Initial Release
