@@ -1649,7 +1649,7 @@ method_backup () {
 
   # Check if I should use the cnf file
   if isEmpty CONFIG_mysql_configuration_file; then
-    mysqlCredentials="--defaults-file=$CONFIG_mysql_configuration_file"
+    mysqlCredentials="--defaults-extra-file=${CONFIG_mysql_configuration_file}"
   else
     mysqlCredentials="--user=${CONFIG_mysql_dump_username} --password=${CONFIG_mysql_dump_password} --host=${CONFIG_mysql_dump_host}"
   fi

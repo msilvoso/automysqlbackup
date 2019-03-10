@@ -595,17 +595,17 @@ echo
 printf 'Select the global configuration directory [/etc/automysqlbackup]: '
 read configdir
 configdir="${configdir%/}" # strip trailing slash if there
-[[ "x$configdir" = "x" ]] && configdir='/etc/automysqlbackup'
+[[ -z $configdir ]] && configdir='/etc/automysqlbackup'
 printf 'Select directory for the executable [/usr/local/bin]: '
 read bindir
 bindir="${bindir%/}" # strip trailing slash if there
-[[ "x$bindir" = "x" ]] && bindir='/usr/local/bin'
+[[ -z $bindir ]] && bindir='/usr/local/bin'
 # Debian configuration file
 DEBIANCNF='/etc/mysql/debian.cnf'
 if [ -f $DEBIANCNF ]; then
   while true; do
     read -p "Debian configuration file found. Should I prepopulate the configuration with the path ? [Y/n] " yn
-    [[ "x$yn" = "x" ]] && { CONFIG_mysql_configuration_file=$DEBIANCNF; break; }
+    [[ -z $yn ]] && { CONFIG_mysql_configuration_file=$DEBIANCNF; break; }
     case $yn in
       [Yy]* ) CONFIG_mysql_configuration_file=$DEBIANCNF; break;;
       [Nn]* ) break;;
